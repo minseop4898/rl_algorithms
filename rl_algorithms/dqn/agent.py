@@ -32,6 +32,8 @@ import rl_algorithms.dqn.utils as dqn_utils
 from rl_algorithms.registry import AGENTS
 from rl_algorithms.utils.config import ConfigDict
 
+from rl_algorithms.registry import build_model
+
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
@@ -125,7 +127,12 @@ class DQNAgent(Agent):
     # pylint: disable=attribute-defined-outside-init
     def _init_network(self):
         """Initialize networks and optimizers."""
-
+        observation_dim = self.env.observation_space.shape
+        action_dim = self.env.action_space.n
+        model_args = dict(observation_dim=observation_dim, action_dim=action_dim)
+        self.model = build_model(self.network_cfg, model_args)
+        print('test')
+       
         if self.use_conv:
             # create CNN
             self.dqn = dqn_utils.get_cnn_model(

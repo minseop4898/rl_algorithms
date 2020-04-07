@@ -37,13 +37,34 @@ agent = dict(
         epsilon_decay=1e-6,  # openai baselines: 1e-7 / 1e-1
     ),
     network_cfg=dict(
-        hidden_sizes=[512],
+        fc_cfg=dict(
+            hidden_sizes=[512],
+            params=dict(
+                # Distributional Q function
+                use_dist_q="IQN",
+                n_tau_samples=64,
+                n_tau_prime_samples=64,
+                n_quantile_samples=32,
+                quantile_embedding_dim=64,
+                kappa=1.0,
+                # NoisyNet
+                use_noisy_net=False,
+                std_init=0.5,
+                # Epsilon Greedy
+                max_epsilon=0.0,
+                min_epsilon=0.0,  # openai baselines: 0.01
+                epsilon_decay=1e-6,  # openai baselines: 1e-7 / 1e-1
+            ),
+        ),
         cnn_cfg=dict(
-            input_sizes=[4, 32, 64],
-            output_sizes=[32, 64, 64],
-            kernel_sizes=[8, 4, 3],
-            strides=[4, 2, 1],
-            paddings=[1, 0, 0],
+            type="IQNCNN",
+            params=dict(
+                input_sizes=[4, 32, 64],
+                output_sizes=[32, 64, 64],
+                kernel_sizes=[8, 4, 3],
+                strides=[4, 2, 1],
+                paddings=[1, 0, 0],
+            )
         ),
     ),
     optim_cfg=dict(

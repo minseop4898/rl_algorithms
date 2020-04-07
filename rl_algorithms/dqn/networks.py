@@ -16,6 +16,7 @@ import torch.nn.functional as F
 from rl_algorithms.common.networks.cnn import CNN
 from rl_algorithms.common.networks.mlp import MLP, init_layer_uniform
 from rl_algorithms.dqn.linear import NoisyMLPHandler
+from rl_algorithms.registry import MODELS
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -73,6 +74,22 @@ class DuelingMLP(MLP, NoisyMLPHandler):
         return x
 
 
+@MODELS.register_module
+class DQNCNN(CNN):
+    """Convolution neural network for DQN."""
+
+    def forward_(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Forward method implementation."""
+        x = self.get_cnn_features(x)
+        out = self.fc_layers.forward_(x)
+        return out
+
+    def reset_noise(self):
+        """Re-sample noise for fc layers."""
+        self.fc_layers.reset_noise()
+
+
+@MODELS.register_module
 class C51CNN(CNN):
     """Convolution neural network for distributional RL."""
 
@@ -153,7 +170,7 @@ class C51DuelingMLP(MLP, NoisyMLPHandler):
 
         return q
 
-
+@MODELS.register_module
 class IQNCNN(CNN):
     """Convolution neural network for distributional RL."""
 
